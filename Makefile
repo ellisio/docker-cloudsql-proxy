@@ -1,19 +1,9 @@
-NAME=veltra/cloudsql-proxy
+NAME=ellisio/cloudsql-proxy
+TAG=1.20.2
 
-.PHONY: all build
+build:
+	@docker build -t $(NAME) -t $(NAME):$(TAG) .
 
-include .env
-
-all: build
-
-build: ## Build docker containers
-	@docker build -t $(NAME) .
-
-start: build ## Start docker containers.
-	docker run -d --name cloudsqlproxy --env-file .env -p 3306:3306 $(NAME)
-
-stop: ## Stop docker containers.
-	@docker rm -f cloudsqlproxy
-
-test: start
-	@docker run --rm --network container:cloudsqlproxy appropriate/curl --retry 10 --retry-connrefused --head telnet://127.0.0.1:3306
+push: build
+	@docker push $(NAME):latest
+	@docker push $(NAME):$(TAG)
